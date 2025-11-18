@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Tony Chuks Awunor <your-email@example.com>"]
 description = "Memory-safe cryptographic utilities for secure key handling and encryption"
 license = "MIT"
-repository = "https://github.com/your-username/rust-crypto-utils"
+repository = "https://github.com/guardsarm/rust-crypto-utils"
 keywords = ["cryptography", "security", "encryption", "memory-safe", "financial"]
 categories = ["cryptography", "authentication"]
 
