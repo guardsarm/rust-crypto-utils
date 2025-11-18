@@ -17,7 +17,10 @@ pub struct Ed25519KeyPair {
 impl Ed25519KeyPair {
     /// Generate a new random key pair
     pub fn generate() -> Self {
-        let signing_key = SigningKey::generate(&mut OsRng);
+        use rand::RngCore;
+        let mut seed = [0u8; 32];
+        OsRng.fill_bytes(&mut seed);
+        let signing_key = SigningKey::from_bytes(&seed);
         Self { signing_key }
     }
 
@@ -66,7 +69,8 @@ impl Ed25519PublicKey {
             return Err("Invalid signature length".to_string());
         }
 
-        let sig_array: [u8; 64] = signature.try_into()
+        let sig_array: [u8; 64] = signature
+            .try_into()
             .map_err(|_| "Failed to convert signature")?;
         let signature = Signature::from_bytes(&sig_array);
 
@@ -102,16 +106,15 @@ impl HmacKey {
 
     /// Generate HMAC tag for message
     pub fn sign(&self, message: &[u8]) -> Vec<u8> {
-        let mut mac = HmacSha256::new_from_slice(&self.key)
-            .expect("HMAC key length error");
+        let mut mac = HmacSha256::new_from_slice(&self.key).expect("HMAC key length error");
         mac.update(message);
         mac.finalize().into_bytes().to_vec()
     }
 
     /// Verify HMAC tag
     pub fn verify(&self, message: &[u8], tag: &[u8]) -> Result<(), String> {
-        let mut mac = HmacSha256::new_from_slice(&self.key)
-            .map_err(|e| format!("HMAC error: {}", e))?;
+        let mut mac =
+            HmacSha256::new_from_slice(&self.key).map_err(|e| format!("HMAC error: {}", e))?;
         mac.update(message);
         mac.verify_slice(tag)
             .map_err(|_| "HMAC verification failed".to_string())

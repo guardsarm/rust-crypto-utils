@@ -4,7 +4,6 @@ use crate::{CryptoError, SecureKey};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
-use zeroize::Zeroizing;
 
 /// Key metadata
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -99,9 +98,7 @@ impl KeyStore {
 
     /// Retrieve a key (returns clone of metadata but reference to key)
     pub fn get_key(&self, key_id: &str) -> Option<(&SecureKey, KeyMetadata)> {
-        self.keys
-            .get(key_id)
-            .map(|(key, meta)| (key, meta.clone()))
+        self.keys.get(key_id).map(|(key, meta)| (key, meta.clone()))
     }
 
     /// Remove a key
@@ -137,15 +134,16 @@ impl KeyStore {
 
     /// Rotate a key (generate new key, increment rotation counter)
     pub fn rotate_key(&mut self, key_id: &str) -> Result<(), CryptoError> {
-        if let Some((_, meta)) = self.keys.get_mut(key_id) {
+        if let Some((_, meta)) = self.keys.get(key_id) {
             let new_key = SecureKey::generate();
-            meta.rotation_count += 1;
-            meta.created_at = SystemTime::now()
+            let mut new_meta = meta.clone();
+            new_meta.rotation_count += 1;
+            new_meta.created_at = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
                 .as_secs();
 
-            self.keys.insert(key_id.to_string(), (new_key, meta.clone()));
+            self.keys.insert(key_id.to_string(), (new_key, new_meta));
             Ok(())
         } else {
             Err(CryptoError::HashingError("Key not found".to_string()))
@@ -307,11 +305,7 @@ mod tests {
         )
         .with_expiration(1);
         store
-            .store_key(
-                "expired".to_string(),
-                SecureKey::generate(),
-                meta_expired,
-            )
+            .store_key("expired".to_string(), SecureKey::generate(), meta_expired)
             .unwrap();
 
         // Add non-expired key

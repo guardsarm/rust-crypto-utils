@@ -13,8 +13,7 @@ fn main() {
     let user_password = SecurePassword::new(b"MySecurePassword123!".to_vec());
 
     println!("   Hashing password with Argon2id...");
-    let password_hash = password::hash_password(&user_password)
-        .expect("Failed to hash password");
+    let password_hash = password::hash_password(&user_password).expect("Failed to hash password");
 
     println!("   Password hash: {}...", &password_hash[..50]);
     println!("   ✓ Hash stored in database\n");
@@ -44,7 +43,7 @@ fn main() {
     // Demonstrate multiple users with different passwords
     println!("4. Multiple User Accounts");
 
-    let users = vec![
+    let users: Vec<(&str, &[u8])> = vec![
         ("alice", b"AlicePass123!"),
         ("bob", b"BobSecure456@"),
         ("charlie", b"Charlie789#Pwd"),
@@ -65,19 +64,40 @@ fn main() {
     let alice_pwd = SecurePassword::new(b"AlicePass123!".to_vec());
     let (_, alice_hash) = &hashes[0];
     let is_valid = password::verify_password(&alice_pwd, alice_hash).unwrap();
-    println!("   Alice authentication: {}", if is_valid { "✓ Success" } else { "✗ Failed" });
+    println!(
+        "   Alice authentication: {}",
+        if is_valid {
+            "✓ Success"
+        } else {
+            "✗ Failed"
+        }
+    );
 
     // Try to authenticate Bob with wrong password
     let wrong_bob_pwd = SecurePassword::new(b"WrongPassword".to_vec());
     let (_, bob_hash) = &hashes[1];
     let is_valid = password::verify_password(&wrong_bob_pwd, bob_hash).unwrap();
-    println!("   Bob authentication (wrong pwd): {}", if is_valid { "✓ Success" } else { "✗ Failed" });
+    println!(
+        "   Bob authentication (wrong pwd): {}",
+        if is_valid {
+            "✓ Success"
+        } else {
+            "✗ Failed"
+        }
+    );
 
     // Authenticate Charlie correctly
     let charlie_pwd = SecurePassword::new(b"Charlie789#Pwd".to_vec());
     let (_, charlie_hash) = &hashes[2];
     let is_valid = password::verify_password(&charlie_pwd, charlie_hash).unwrap();
-    println!("   Charlie authentication: {}", if is_valid { "✓ Success" } else { "✗ Failed" });
+    println!(
+        "   Charlie authentication: {}",
+        if is_valid {
+            "✓ Success"
+        } else {
+            "✗ Failed"
+        }
+    );
 
     println!("\n=== Security Features ===");
     println!("✓ Argon2id algorithm (resistant to GPU attacks)");

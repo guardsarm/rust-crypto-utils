@@ -18,12 +18,12 @@
 //! 2024 CISA/FBI guidance for memory-safe cryptographic implementations.
 
 pub mod keyderivation;
-pub mod signatures;
 pub mod keymanagement;
+pub mod signatures;
 
-pub use keyderivation::{DerivedKey, Hkdf, Pbkdf2, PasswordStrength};
-pub use signatures::{Ed25519KeyPair, Ed25519PublicKey, HmacKey, SignatureSuite};
+pub use keyderivation::{DerivedKey, Hkdf, PasswordStrength, Pbkdf2};
 pub use keymanagement::{KeyMetadata, KeyStore, RotationPolicy};
+pub use signatures::{Ed25519KeyPair, Ed25519PublicKey, HmacKey, SignatureSuite};
 
 use aes_gcm::{
     aead::{Aead, KeyInit, OsRng},
@@ -31,9 +31,9 @@ use aes_gcm::{
 };
 use argon2::{
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
-    Argon2, Algorithm, Version, Params,
+    Algorithm, Argon2, Params, Version,
 };
-use hmac::{Hmac, Mac};
+use hmac::Hmac;
 use rand::RngCore;
 use sha2::Sha256;
 use thiserror::Error;
@@ -272,10 +272,7 @@ pub mod encryption {
     }
 
     /// Decrypt data using AES-256-GCM
-    pub fn decrypt(
-        key: &SecureKey,
-        encrypted: &EncryptedData,
-    ) -> Result<Vec<u8>, CryptoError> {
+    pub fn decrypt(key: &SecureKey, encrypted: &EncryptedData) -> Result<Vec<u8>, CryptoError> {
         let cipher = Aes256Gcm::new_from_slice(key.as_bytes())
             .map_err(|e| CryptoError::DecryptionError(e.to_string()))?;
 
@@ -313,12 +310,13 @@ pub mod random {
 }
 
 /// HMAC-SHA256 utilities for message authentication
-pub mod hmac {
+pub mod hmac_ops {
     use super::*;
+    use hmac::Mac;
 
     /// Compute HMAC-SHA256 for a message
     pub fn compute_hmac(key: &SecureKey, message: &[u8]) -> Result<Vec<u8>, CryptoError> {
-        let mut mac = HmacSha256::new_from_slice(key.as_bytes())
+        let mut mac = <HmacSha256 as Mac>::new_from_slice(key.as_bytes())
             .map_err(|e| CryptoError::HmacError(e.to_string()))?;
 
         mac.update(message);
@@ -331,7 +329,7 @@ pub mod hmac {
         message: &[u8],
         expected_hmac: &[u8],
     ) -> Result<bool, CryptoError> {
-        let mut mac = HmacSha256::new_from_slice(key.as_bytes())
+        let mut mac = <HmacSha256 as Mac>::new_from_slice(key.as_bytes())
             .map_err(|e| CryptoError::HmacError(e.to_string()))?;
 
         mac.update(message);
@@ -482,19 +480,19 @@ mod tests {
         let key = SecureKey::generate();
         let message = b"Important financial transaction data";
 
-        let hmac_result = hmac::compute_hmac(&key, message).unwrap();
+        let hmac_result = hmac_ops::compute_hmac(&key, message).unwrap();
         assert_eq!(hmac_result.len(), 32); // SHA-256 produces 32 bytes
 
         // Verify correct HMAC
-        assert!(hmac::verify_hmac(&key, message, &hmac_result).unwrap());
+        assert!(hmac_ops::verify_hmac(&key, message, &hmac_result).unwrap());
 
         // Verify fails with wrong key
         let wrong_key = SecureKey::generate();
-        assert!(!hmac::verify_hmac(&wrong_key, message, &hmac_result).unwrap());
+        assert!(!hmac_ops::verify_hmac(&wrong_key, message, &hmac_result).unwrap());
 
         // Verify fails with modified message
         let modified_message = b"Modified transaction data";
-        assert!(!hmac::verify_hmac(&key, modified_message, &hmac_result).unwrap());
+        assert!(!hmac_ops::verify_hmac(&key, modified_message, &hmac_result).unwrap());
     }
 
     #[test]
@@ -549,19 +547,19 @@ mod tests {
         let message1 = b"Message 1";
         let message2 = b"Message 2";
 
-        let hmac1 = hmac::compute_hmac(&key, message1).unwrap();
-        let hmac2 = hmac::compute_hmac(&key, message2).unwrap();
+        let hmac1 = hmac_ops::compute_hmac(&key, message1).unwrap();
+        let hmac2 = hmac_ops::compute_hmac(&key, message2).unwrap();
 
         // Different messages should produce different HMACs
         assert_ne!(hmac1, hmac2);
 
         // Each HMAC should verify against its own message
-        assert!(hmac::verify_hmac(&key, message1, &hmac1).unwrap());
-        assert!(hmac::verify_hmac(&key, message2, &hmac2).unwrap());
+        assert!(hmac_ops::verify_hmac(&key, message1, &hmac1).unwrap());
+        assert!(hmac_ops::verify_hmac(&key, message2, &hmac2).unwrap());
 
         // HMACs should not cross-verify
-        assert!(!hmac::verify_hmac(&key, message1, &hmac2).unwrap());
-        assert!(!hmac::verify_hmac(&key, message2, &hmac1).unwrap());
+        assert!(!hmac_ops::verify_hmac(&key, message1, &hmac2).unwrap());
+        assert!(!hmac_ops::verify_hmac(&key, message2, &hmac1).unwrap());
     }
 
     #[test]

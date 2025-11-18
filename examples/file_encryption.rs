@@ -28,24 +28,34 @@ Transaction History:
     println!("   ✓ Generated 256-bit encryption key");
 
     // Encrypt the data
-    let encrypted_data = encryption::encrypt(&encryption_key, financial_data)
-        .expect("Encryption failed");
+    let encrypted_data =
+        encryption::encrypt(&encryption_key, financial_data).expect("Encryption failed");
 
     println!("   ✓ Data encrypted with AES-256-GCM");
-    println!("   Encrypted size: {} bytes", encrypted_data.ciphertext.len());
-    println!("   Nonce (12 bytes): {}", hex::encode(&encrypted_data.nonce));
-    println!("   First 32 bytes of ciphertext: {}...",
-             hex::encode(&encrypted_data.ciphertext[..32.min(encrypted_data.ciphertext.len())]));
+    println!(
+        "   Encrypted size: {} bytes",
+        encrypted_data.ciphertext.len()
+    );
+    println!(
+        "   Nonce (12 bytes): {}",
+        hex::encode(encrypted_data.nonce)
+    );
+    println!(
+        "   First 32 bytes of ciphertext: {}...",
+        hex::encode(&encrypted_data.ciphertext[..32.min(encrypted_data.ciphertext.len())])
+    );
 
     // Decrypt the data
     println!("\n2. Decrypting Data with Correct Key");
-    let decrypted_data = encryption::decrypt(&encryption_key, &encrypted_data)
-        .expect("Decryption failed");
+    let decrypted_data =
+        encryption::decrypt(&encryption_key, &encrypted_data).expect("Decryption failed");
 
     let decrypted_text = String::from_utf8(decrypted_data.clone()).unwrap();
     println!("   ✓ Decryption successful!");
-    println!("   Decrypted data matches original: {}",
-             decrypted_data == financial_data);
+    println!(
+        "   Decrypted data matches original: {}",
+        decrypted_data == financial_data
+    );
     println!("\n   Decrypted content:");
     println!("{}", decrypted_text);
 
@@ -60,30 +70,40 @@ Transaction History:
     // Encrypt multiple files
     println!("\n4. Encrypting Multiple Financial Records");
 
-    let records = vec![
-        ("customer_001.txt", b"Customer: Alice Johnson, Account: ACC-001, Balance: $50,000"),
-        ("customer_002.txt", b"Customer: Bob Williams, Account: ACC-002, Balance: $75,250"),
-        ("customer_003.txt", b"Customer: Carol Davis, Account: ACC-003, Balance: $100,500"),
+    let records: Vec<(&str, &[u8])> = vec![
+        (
+            "customer_001.txt",
+            b"Customer: Alice Johnson, Account: ACC-001, Balance: $50,000",
+        ),
+        (
+            "customer_002.txt",
+            b"Customer: Bob Williams, Account: ACC-002, Balance: $75,250",
+        ),
+        (
+            "customer_003.txt",
+            b"Customer: Carol Davis, Account: ACC-003, Balance: $100,500",
+        ),
     ];
 
     let mut encrypted_records = Vec::new();
 
     for (filename, data) in &records {
-        let encrypted = encryption::encrypt(&encryption_key, data)
-            .expect("Encryption failed");
+        let encrypted = encryption::encrypt(&encryption_key, data).expect("Encryption failed");
         encrypted_records.push((filename, encrypted));
         println!("   ✓ Encrypted {}", filename);
     }
 
     // Decrypt and verify all records
     println!("\n5. Decrypting All Records");
-    for ((filename, original_data), (_, encrypted)) in records.iter().zip(encrypted_records.iter()) {
-        let decrypted = encryption::decrypt(&encryption_key, encrypted)
-            .expect("Decryption failed");
+    for ((filename, original_data), (_, encrypted)) in records.iter().zip(encrypted_records.iter())
+    {
+        let decrypted = encryption::decrypt(&encryption_key, encrypted).expect("Decryption failed");
         let matches = &decrypted == original_data;
-        println!("   {} - Decryption: {}",
-                 filename,
-                 if matches { "✓ Success" } else { "✗ Failed" });
+        println!(
+            "   {} - Decryption: {}",
+            filename,
+            if matches { "✓ Success" } else { "✗ Failed" }
+        );
     }
 
     // Generate secure tokens

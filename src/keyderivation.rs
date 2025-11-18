@@ -1,6 +1,6 @@
 //! Key derivation functions (PBKDF2, HKDF)
 
-use hmac::{Hmac, Mac};
+use hmac::Hmac;
 use sha2::{Sha256, Sha512};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
@@ -93,8 +93,7 @@ impl Hkdf {
 
         let hk = HkdfImpl::<Sha256>::new(Some(salt), input_key_material);
         let mut okm = vec![0u8; output_length];
-        hk.expand(info, &mut okm)
-            .expect("HKDF expand failed");
+        hk.expand(info, &mut okm).expect("HKDF expand failed");
 
         DerivedKey::from_bytes(okm)
     }
@@ -160,10 +159,13 @@ impl PasswordStrength {
 
         // Common password check (basic)
         let common_passwords = [
-            "password", "123456", "qwerty", "admin", "letmein", "welcome",
-            "monkey", "dragon", "master", "sunshine", "princess", "football"
+            "password", "123456", "qwerty", "admin", "letmein", "welcome", "monkey", "dragon",
+            "master", "sunshine", "princess", "football",
         ];
-        if common_passwords.iter().any(|&common| password.to_lowercase().contains(common)) {
+        if common_passwords
+            .iter()
+            .any(|&common| password.to_lowercase().contains(common))
+        {
             score = score.saturating_sub(2);
             feedback.push("Avoid common passwords".to_string());
         }
@@ -276,7 +278,7 @@ mod tests {
 
     #[test]
     fn test_password_strength_sequential() {
-        let (score, feedback) = PasswordStrength::check("abc123xyz");
+        let (_score, feedback) = PasswordStrength::check("abc123xyz");
         assert!(feedback.iter().any(|f| f.contains("sequential")));
     }
 
