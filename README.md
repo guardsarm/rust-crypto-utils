@@ -1,5 +1,10 @@
 # Rust Crypto Utils
 
+[![CI](https://github.com/guardsarm/rust-crypto-utils/actions/workflows/ci.yml/badge.svg)](https://github.com/guardsarm/rust-crypto-utils/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/v/rust-crypto-utils.svg)](https://crates.io/crates/rust-crypto-utils)
+[![Documentation](https://docs.rs/rust-crypto-utils/badge.svg)](https://docs.rs/rust-crypto-utils)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Memory-safe cryptographic utilities for financial systems and secure applications. Built with Rust to eliminate memory vulnerabilities in cryptographic implementations.
 
 ## Security-First Design
@@ -175,9 +180,9 @@ If you discover a security vulnerability, please email security@example.com (do 
 
 ## Related Projects
 
-- [rust-secure-logger](https://github.com/your-username/rust-secure-logger) - Secure logging with cryptographic integrity
-- [rust-transaction-validator](https://github.com/your-username/rust-transaction-validator) - Financial transaction validation
-- [rust-threat-detector](https://github.com/your-username/rust-threat-detector) - SIEM threat detection
+- [rust-secure-logger](https://github.com/guardsarm/rust-secure-logger) - Secure logging with cryptographic integrity
+- [rust-transaction-validator](https://github.com/guardsarm/rust-transaction-validator) - Financial transaction validation
+- [rust-threat-detector](https://github.com/guardsarm/rust-threat-detector) - SIEM threat detection
 
 ## Citation
 
@@ -185,7 +190,7 @@ If you use this library in research or production systems, please cite:
 
 ```
 Awunor, T.C. (2024). Rust Crypto Utils: Memory-Safe Cryptographic Utilities.
-https://github.com/your-username/rust-crypto-utils
+https://github.com/guardsarm/rust-crypto-utils
 ```
 
 ---
