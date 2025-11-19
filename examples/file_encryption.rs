@@ -36,10 +36,7 @@ Transaction History:
         "   Encrypted size: {} bytes",
         encrypted_data.ciphertext.len()
     );
-    println!(
-        "   Nonce (12 bytes): {}",
-        hex::encode(encrypted_data.nonce)
-    );
+    println!("   Nonce (12 bytes): {}", hex::encode(encrypted_data.nonce));
     println!(
         "   First 32 bytes of ciphertext: {}...",
         hex::encode(&encrypted_data.ciphertext[..32.min(encrypted_data.ciphertext.len())])
