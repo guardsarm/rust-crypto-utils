@@ -3,7 +3,7 @@
 //! Provides multiple hash algorithms: SHA-256, SHA-3, and BLAKE3.
 
 use serde::{Deserialize, Serialize};
-use sha2::{Sha256, Sha512, Digest as Sha2Digest};
+use sha2::{Digest as Sha2Digest, Sha256, Sha512};
 use sha3::{Sha3_256, Sha3_512};
 use thiserror::Error;
 
@@ -99,7 +99,12 @@ impl HashOutput {
 
 impl std::fmt::Debug for HashOutput {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "HashOutput({}: {})", self.algorithm.name(), &self.to_hex()[..16])
+        write!(
+            f,
+            "HashOutput({}: {})",
+            self.algorithm.name(),
+            &self.to_hex()[..16]
+        )
     }
 }
 
@@ -172,6 +177,7 @@ pub struct IncrementalHasher {
     algorithm: HashAlgorithm,
 }
 
+#[allow(clippy::large_enum_variant)]
 enum IncrementalState {
     Sha256(Sha256),
     Sha512(Sha512),
@@ -200,7 +206,9 @@ impl IncrementalHasher {
             IncrementalState::Sha512(h) => h.update(data),
             IncrementalState::Sha3_256(h) => h.update(data),
             IncrementalState::Sha3_512(h) => h.update(data),
-            IncrementalState::Blake3(h) => { h.update(data); }
+            IncrementalState::Blake3(h) => {
+                h.update(data);
+            }
         }
     }
 

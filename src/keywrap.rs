@@ -178,13 +178,22 @@ impl KeyHierarchy {
     }
 
     /// Wrap a data key at a specific level
-    pub fn wrap_data_key(&self, key: &[u8], level: usize, key_id: &str) -> Result<WrappedKey, KeyWrapError> {
+    pub fn wrap_data_key(
+        &self,
+        key: &[u8],
+        level: usize,
+        key_id: &str,
+    ) -> Result<WrappedKey, KeyWrapError> {
         let wrapper = self.get_level_wrapper(level)?;
         wrapper.wrap(key, key_id)
     }
 
     /// Unwrap a data key at a specific level
-    pub fn unwrap_data_key(&self, wrapped: &WrappedKey, level: usize) -> Result<Vec<u8>, KeyWrapError> {
+    pub fn unwrap_data_key(
+        &self,
+        wrapped: &WrappedKey,
+        level: usize,
+    ) -> Result<Vec<u8>, KeyWrapError> {
         let wrapper = self.get_level_wrapper(level)?;
         wrapper.unwrap(wrapped)
     }
@@ -260,7 +269,9 @@ mod tests {
 
         // Wrap a data key at level 0
         let data_key = vec![42u8; 32];
-        let wrapped = hierarchy.wrap_data_key(&data_key, 0, "data-key-001").unwrap();
+        let wrapped = hierarchy
+            .wrap_data_key(&data_key, 0, "data-key-001")
+            .unwrap();
 
         // Unwrap it
         let unwrapped = hierarchy.unwrap_data_key(&wrapped, 0).unwrap();

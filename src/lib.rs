@@ -32,19 +32,19 @@
 //! - **Enhanced Key Rotation**: Automatic key rotation with versioning
 //! - **Audit Logging**: Cryptographic operation audit trail
 
-pub mod keyderivation;
-pub mod keymanagement;
-pub mod signatures;
-pub mod keyexchange;
 pub mod hashing;
+pub mod keyderivation;
+pub mod keyexchange;
+pub mod keymanagement;
 pub mod keywrap;
+pub mod signatures;
 
+pub use hashing::{HashAlgorithm, HashOutput, Hasher};
 pub use keyderivation::{DerivedKey, Hkdf, PasswordStrength, Pbkdf2};
+pub use keyexchange::{SharedSecret, X25519KeyPair, X25519PublicKey};
 pub use keymanagement::{KeyMetadata, KeyStore, RotationPolicy};
-pub use signatures::{Ed25519KeyPair, Ed25519PublicKey, HmacKey, SignatureSuite};
-pub use keyexchange::{X25519KeyPair, X25519PublicKey, SharedSecret};
-pub use hashing::{HashAlgorithm, Hasher, HashOutput};
 pub use keywrap::{KeyWrapper, WrappedKey};
+pub use signatures::{Ed25519KeyPair, Ed25519PublicKey, HmacKey, SignatureSuite};
 
 use aes_gcm::{
     aead::{Aead, KeyInit, OsRng},

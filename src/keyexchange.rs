@@ -3,10 +3,10 @@
 //! Provides Elliptic Curve Diffie-Hellman (ECDH) key exchange using X25519.
 
 use rand::rngs::OsRng;
-use x25519_dalek::{EphemeralSecret, PublicKey, StaticSecret};
-use zeroize::{Zeroize, ZeroizeOnDrop};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use x25519_dalek::{EphemeralSecret, PublicKey, StaticSecret};
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// Key exchange errors
 #[derive(Error, Debug)]
@@ -45,7 +45,7 @@ impl X25519PublicKey {
 
     /// Convert to hex string
     pub fn to_hex(&self) -> String {
-        hex::encode(&self.bytes)
+        hex::encode(self.bytes)
     }
 
     /// Create from hex string
@@ -79,8 +79,8 @@ impl SharedSecret {
 
     /// Derive an encryption key using HKDF
     pub fn derive_key(&self, info: &[u8]) -> [u8; 32] {
-        use sha2::Sha256;
         use hkdf::Hkdf;
+        use sha2::Sha256;
 
         let hk = Hkdf::<Sha256>::new(None, &self.bytes);
         let mut okm = [0u8; 32];
@@ -164,7 +164,10 @@ impl EphemeralX25519KeyPair {
     }
 
     /// Perform key exchange (consumes the ephemeral secret)
-    pub fn exchange(mut self, peer_public: &X25519PublicKey) -> Result<SharedSecret, KeyExchangeError> {
+    pub fn exchange(
+        mut self,
+        peer_public: &X25519PublicKey,
+    ) -> Result<SharedSecret, KeyExchangeError> {
         let secret = self.secret.take().ok_or(KeyExchangeError::ExchangeFailed)?;
         let shared = secret.diffie_hellman(&peer_public.to_dalek());
         Ok(SharedSecret {

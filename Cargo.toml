@@ -51,7 +51,3 @@ path = "examples/password_hashing.rs"
 name = "file_encryption"
 path = "examples/file_encryption.rs"
 
-[[example]]
-name = "key_exchange"
-path = "examples/key_exchange.rs"
-
