@@ -1,4 +1,4 @@
-//! # Rust Crypto Utils
+//! # Rust Crypto Utils v2.0
 //!
 //! Production-ready, memory-safe cryptographic utilities for financial systems and secure applications.
 //!
@@ -7,23 +7,44 @@
 //! - **Memory Safety**: Automatic zeroization of sensitive data
 //! - **Secure Password Hashing**: Argon2id with configurable parameters
 //! - **AES-256-GCM Encryption**: Authenticated encryption with associated data
-//! - **Key Derivation**: PBKDF2 and HKDF (NIST SP 800-132, RFC 5869)
-//! - **Digital Signatures**: Ed25519 and HMAC-SHA256
+//! - **ChaCha20-Poly1305**: Alternative AEAD cipher for cross-platform use (v2.0)
+//! - **Key Derivation**: PBKDF2, HKDF, and Argon2 (NIST SP 800-132, RFC 5869)
+//! - **Digital Signatures**: Ed25519 and HMAC-SHA256/SHA3
+//! - **Key Exchange**: X25519 Diffie-Hellman key exchange (v2.0)
 //! - **Key Management**: Secure key storage with rotation policies
 //! - **Secure Random Generation**: Cryptographically secure random number generation
+//! - **Hash Functions**: SHA-256, SHA-3, BLAKE3 for high-performance hashing (v2.0)
+//! - **Constant-Time Operations**: Timing attack resistant comparisons (v2.0)
+//! - **Key Wrapping**: Secure key wrapping for key hierarchies (v2.0)
 //!
 //! ## Alignment with Federal Guidance
 //!
 //! Implements cryptographic best practices recommended by NIST and aligns with
 //! 2024 CISA/FBI guidance for memory-safe cryptographic implementations.
+//!
+//! ## What's New in v2.0
+//!
+//! - **ChaCha20-Poly1305**: Cross-platform authenticated encryption
+//! - **X25519 Key Exchange**: Secure key agreement protocol
+//! - **BLAKE3 Hashing**: High-performance cryptographic hashing
+//! - **SHA-3 Support**: NIST-approved hash function family
+//! - **Key Wrapping**: AES-KW for secure key storage
+//! - **Enhanced Key Rotation**: Automatic key rotation with versioning
+//! - **Audit Logging**: Cryptographic operation audit trail
 
 pub mod keyderivation;
 pub mod keymanagement;
 pub mod signatures;
+pub mod keyexchange;
+pub mod hashing;
+pub mod keywrap;
 
 pub use keyderivation::{DerivedKey, Hkdf, PasswordStrength, Pbkdf2};
 pub use keymanagement::{KeyMetadata, KeyStore, RotationPolicy};
 pub use signatures::{Ed25519KeyPair, Ed25519PublicKey, HmacKey, SignatureSuite};
+pub use keyexchange::{X25519KeyPair, X25519PublicKey, SharedSecret};
+pub use hashing::{HashAlgorithm, Hasher, HashOutput};
+pub use keywrap::{KeyWrapper, WrappedKey};
 
 use aes_gcm::{
     aead::{Aead, KeyInit, OsRng},
